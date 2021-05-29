@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  </head>
+  <body>
+    <h1>課題！！！！！！！！！！！！！</h1>
+
+    <% require 'pg' %>
+    <% connection = PG::connect(dbname: "goya") %>
+    <% connection.internal_encoding = "UTF-8" %>
+
+    <% kadai1 = connection.exec("select give_for from crops WHERE give_for != '自家消費';") %>
+    <% kadai1_data = [] %>
+    <% kadai1.each do |record| %>
+      <%  kadai1_data << "売った相手：#{record["give_for"]}" %>
+    <% end %>
+    <form action="sold.cgi" method="POST">
+       下記のボタンを押すと、売ったゴーヤの情報ページに飛びます<br><br>
+       <!-- valueには、送りたいデータを代入する -->
+       <!-- name="sold"を、情報の目印とする -->
+      <input type="text" name="sold" value="<%= kadai1_data.join(' ') %>">
+      <input type="submit" name="送信" >
+    </form>
+
+    <% kadai2 = connection.exec("select give_for, length, weight from crops WHERE quality = false;") %>
+    <% kadai2_data = [] %>
+    <% kadai2.each do |record| %>
+      <%  kadai2_data << "売った相手：#{record["give_for"]}"  "長さ：#{record["length"]}cm"  "重さ：#{record["weight"]}g" %>
+    <% end %>
+    <form action="false.cgi" method="POST">
+       下記のボタンを押すと、品質の悪いゴーヤの情報ページに飛びます<br><br>
+       <!-- valueには、送りたいデータを代入する -->
+       <!-- name="false"を、情報の目印とする -->
+      <input type="text" name="false" value="<%= kadai2_data.join(' ') %>">
+      <input type="submit" name="送信" >
+    </form>
+
+
+  </body>
+</html>
